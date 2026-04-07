@@ -5,18 +5,23 @@ $data = mysqli_query($conn, "SELECT * FROM berita WHERE id='$id'");
 $r = mysqli_fetch_array($data);
 
 if (isset($_POST['update'])) {
-    $judul = $_POST['judul'];
-    $isi = $_POST['isi'];
+    $judul = mysqli_real_escape_string($conn, $_POST['judul']); // Tambahkan ini
+    $isi   = mysqli_real_escape_string($conn, $_POST['isi']);   // Tambahkan ini
     
     // Cek apakah user ganti gambar atau tidak
     if ($_FILES['gambar']['name'] != "") {
         $foto = $_FILES['gambar']['name'];
         move_uploaded_file($_FILES['gambar']['tmp_name'], "img/".$foto);
-        mysqli_query($conn, "UPDATE berita SET judul='$judul', isi='$isi', gambar='$foto' WHERE id='$id'");
+        $query = "UPDATE berita SET judul='$judul', isi='$isi', gambar='$foto' WHERE id='$id'";
     } else {
-        mysqli_query($conn, "UPDATE berita SET judul='$judul', isi='$isi' WHERE id='$id'");
+        $query = "UPDATE berita SET judul='$judul', isi='$isi' WHERE id='$id'";
     }
-    header("location:admin.php");
+    
+    if(mysqli_query($conn, $query)) {
+        header("location:admin.php");
+    } else {
+        echo "Error: " . mysqli_error($conn);
+    }
 }
 ?>
 
